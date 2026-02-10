@@ -200,9 +200,6 @@ def menu_impiegati(banca, impiegato):
 
                 elif impiegato.ruolo == "Consulente Finanziario":
                     id_cliente = int(input("Inserisci l'id del cliente : "))
-                    if not esiste_cliente(id_cliente):
-                        print("Il cliente non esiste!")
-                        continue
                     numero_conto = input("Inserisci il numero del conto : ")
                     while True :
                         tipo = input("Inserisci il tipo del conto (Conto corrente o Conto Risparmio): ").strip().lower()
