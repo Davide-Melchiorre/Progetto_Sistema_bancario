@@ -55,6 +55,43 @@ def seleziona_atm(banca):
         else:
             print("Id non presente. Lo sportello non esiste .")
 
+#controllo esistenza conto per gestire eventuali errori 
+def esiste_conto(id_da_verificare):
+    connection = mysql.connector.connect(**DB_CONNNESIONE)
+    cursor = connection.cursor()
+    try:
+        sql = f"SELECT id_conto FROM conti WHERE id_conto = {id_da_verificare}"
+        cursor.execute(sql)
+        risultato = cursor.fetchone()
+        if risultato:
+            return True
+        else:
+            return False
+    except mysql.connector.Error:
+        return False
+    finally:
+        cursor.close()
+        connection.close()
+
+
+#controllo esistenza cliente per gestire eventuali errori 
+def esiste_cliente(id_da_verificare):
+    connection = mysql.connector.connect(**DB_CONNNESIONE)
+    cursor = connection.cursor()
+    try:
+        sql = f"SELECT id_cliente FROM cliente WHERE id_cliente = {id_da_verificare}"
+        cursor.execute(sql)
+        risultato = cursor.fetchone()
+        if risultato:
+            return True
+        else:
+            return False
+    except mysql.connector.Error:
+        return False
+    finally:
+        cursor.close()
+        connection.close()
+
 #menu per l'amministratore della banca
 def menu_admin(banca):
     while True:
@@ -155,11 +192,17 @@ def menu_impiegati(banca, impiegato):
             case 2:
                 if impiegato.ruolo == "Cassiere":
                     id_conto = int(input("Inserisci l'id conto del cliente : "))
+                    if not esiste_conto(id_conto):
+                        print("id_conto errato!")
+                        continue
                     importo = float(input("Inserisci l'importo da versare : "))
                     impiegato.effettua_versamento(id_conto, importo)
 
                 elif impiegato.ruolo == "Consulente Finanziario":
                     id_cliente = int(input("Inserisci l'id del cliente : "))
+                    if not esiste_cliente(id_cliente):
+                        print("Il cliente non esiste!")
+                        continue
                     numero_conto = input("Inserisci il numero del conto : ")
                     while True :
                         tipo = input("Inserisci il tipo del conto (Conto corrente o Conto Risparmio): ").strip().lower()
@@ -178,6 +221,9 @@ def menu_impiegati(banca, impiegato):
             case 3:
                 if impiegato.ruolo == "Cassiere":
                     id_cliente = int(input("Inserisci l'id del cliente : "))
+                    if not esiste_cliente(id_cliente):
+                        print("Il cliente non esiste!")
+                        continue
                     importo = float(input("Inserisci l'importo da prelevare : "))
                     impiegato.effettua_prelievo(id_cliente, importo)
                 elif impiegato.ruolo == "Consulente Finanziario":
@@ -185,7 +231,7 @@ def menu_impiegati(banca, impiegato):
                     id_conti_clienti = impiegato.leggi_conti_clienti(id_cliente)
                     if not id_conti_clienti:
                         print("Il cliente non ha conti aperti.")
-                        break
+                        continue
                     lista_id_validi =[]
                     for c in id_conti_clienti:
                         print(f"Id : {c['id_conto']} - {c['tipo_conto']}")
@@ -193,7 +239,7 @@ def menu_impiegati(banca, impiegato):
                     id_conto = int(input("Inserisci Id conto da collegare : "))
                     if id_conto not in lista_id_validi:
                         print("Id conto non valido.")
-                        break
+                        continue
                     numero_carta = int(input("Inserisci numero carta : "))
                     pin = int(input("Inserisci pin carta : "))
                     data_scadenza = input("Insersci data scadenza : ")
