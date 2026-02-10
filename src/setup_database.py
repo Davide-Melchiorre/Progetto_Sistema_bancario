@@ -122,5 +122,65 @@ def creazione_tabelle():
     except mysql.connector.Error as err:
         print(f"Errore: {err}")
 
+def inserimento_dati():
+    try:
+        connection = mysql.connector.connect(**DB_CONNNESIONE)
+        cursor = connection.cursor()
+        sql_filiali = """
+        INSERT INTO filiali (codice_filiale, indirizzo) VALUES 
+        ('RM001', 'Via del Corso 10, Roma'),
+        ('MI001', 'Piazza Duomo 5, Milano'),
+        ('NA001', 'Via Toledo 20, Napoli');
+        """
+        cursor.execute(sql_filiali)
+        sql_impiegati = """
+        INSERT INTO impiegati (nome, cognome, email, ruolo, id_filiale, password_hash) VALUES 
+        ('Davide', 'Melchiorre', 'admin@banca.it', 'Amministratore', NULL, 'admin123'),
+        ('Luca', 'Bianchi', 'luca.cassiere@banca.it', 'Cassiere', 1, 'prova123'),
+        ('Anna', 'Verdi', 'anna.consulente@banca.it', 'Consulente Finanziario', 2, 'prova123');
+        """
+        cursor.execute(sql_impiegati)
+
+        sql_clienti = """
+        INSERT INTO clienti (nome, cognome, codice_fiscale, email, password_hash, id_filiale) VALUES 
+        ('Mario', 'Rossi', 'RSSMRA80A01H501U', 'mario.rossi@email.com', 'Prova123, 1),
+        ('Giulia', 'Neri', 'NREGLL90B02F205Z', 'giulia.neri@email.com', 'password234', 2);
+        """
+        cursor.execute(sql_clienti)
+        sql_conti = """
+        INSERT INTO conti (numero_conto, tipo_conto, id_cliente, limite_scoperto, tasso_interesse) VALUES 
+        ('IT010000001', 'Conto corrente', 1, 1000.00, 0),
+        ('IT010000002', 'Conto Risparmio', 1, 0, 2.5),
+        ('IT020000001', 'Conto corrente', 2, 500.00, 0);
+        """
+        cursor.execute(sql_conti)
+        sql_carte = """
+        INSERT INTO carte (numero_carta, pin_hash, tipo_carta, id_conto_collegato, id_cliente, plafond_mensile, data_scadenza) VALUES 
+        ('1234567891234456', '123', 'Debito', 1, 1, 0, '12/28'),
+        ('7264849502847493', '456', 'Credito', 1, 1, 3000.00, '12/29'),
+        ('9274957364837495', '789', 'Debito', 3, 2, 0, '05/27');
+        """
+        cursor.execute(sql_carte)
+        sql_atm = """
+        INSERT INTO sportelli_atm (id_filiale, stato_atm, importo_disponibile) VALUES 
+        (1, 'Attivo', 50000.00),
+        (2, 'Fuori Servizio', 0.00);
+        """
+        cursor.execute(sql_atm)
+        sql_transazioni = """
+        INSERT INTO transazioni (id_conto_sorgente, id_carta, importo, tipo_transazione, descrizione) VALUES 
+        (1, NULL, 1000.00, 'Bonifico Entrata', 'Stipendio'),
+        (1, 1, -50.00, 'Pagamento POS', 'Spesa Supermercato'),
+        (1, NULL, -100.00, 'Bonifico Uscita', 'Regalo');
+        """
+        cursor.execute(sql_transazioni)
+        connection.commit()
+        cursor.close()
+        connection.close()
+
+    except mysql.connector.Error as err:
+        print(f"Errore: {err}")
+
 if __name__ == "__main__":
     creazione_tabelle()
+    #inserimento_dati()
